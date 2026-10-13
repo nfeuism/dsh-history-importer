@@ -2,12 +2,12 @@
 
 将本机 **Codex** 和 **Hermes Agent** 的历史对话正文导入 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)，并按来源显示在两个项目中。
 
-目前适配 **macOS、DeepSeek Harness 0.2.0-rc.2**。这是社区工具，不是 DeepSeek 官方功能；其他版本尚未确认兼容。
+目前面向 **macOS / Windows、DeepSeek Harness 0.2.0-rc.2**。Windows 版本由 GitHub Actions 在 Windows 环境构建并检查；尚未在真实 Windows Harness 安装上实测。这是社区工具，不是 DeepSeek 官方功能。
 
 ## 准备
 
 1. 先安装并启动一次 DeepSeek Harness，完成初始设置，然后**完全退出应用**。
-2. 准备 Python 3.9 或更新版本，以及 `zstd`：
+2. 准备 Python 3.9 或更新版本。macOS 可安装 `zstd`：
 
    ```bash
    brew install zstd
@@ -19,6 +19,14 @@
    git clone https://github.com/nfeuism/dsh-history-importer.git
    cd dsh-history-importer
    ```
+
+Windows 和 macOS 都可安装 Python 压缩依赖，替代 `zstd` 命令：
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+Windows PowerShell 中，将文中的 `python3` 换成 `py -3`；安装依赖用 `py -3 -m pip install -r requirements.txt`。也可从 [Releases](https://github.com/nfeuism/dsh-history-importer/releases) 下载 Windows `.exe`，无需另装 Python。Windows 构建状态见 [GitHub Actions](https://github.com/nfeuism/dsh-history-importer/actions/workflows/windows-build.yml)。
 
 不需要提供账号密码或 API Key；程序只读取本机的历史文件。
 
@@ -80,7 +88,7 @@ python3 dsh_import.py --import \
 
 ## 遇到问题
 
-- 提示找不到 `zstd`：在终端运行 `brew install zstd`。
+- 提示缺少 Zstandard：运行 `python3 -m pip install -r requirements.txt`；macOS 也可运行 `brew install zstd`。
 - 提示 Harness 正在运行：从应用菜单完全退出后重试。
 - 预览结果为零：确认来源程序确实在默认位置保存了本地历史，或用自定义路径参数指定位置。
 - 侧栏或聊天内容为空：先运行 `python3 dsh_import.py --verify`，再确认 Harness 版本是 0.2.0-rc.2。报告问题时不要公开提交聊天记录或 `~/.dsh` 整个目录。
