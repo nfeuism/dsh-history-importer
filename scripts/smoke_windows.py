@@ -40,6 +40,7 @@ def run() -> None:
                 (1, "sample-hermes", "user", "Hello from a synthetic Hermes chat", 1791849600, 1),
                 (2, "sample-hermes", "assistant", "Synthetic reply", 1791849601, 1),
             ])
+            db.commit()
         dsh = root / "dsh"
         registry = dsh / "storages" / "workspace.json"
         registry.parent.mkdir(parents=True)
