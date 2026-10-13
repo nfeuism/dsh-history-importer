@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f9fc">
+  <meta name="description" content="把本机 Codex 和 Hermes Agent 的历史对话正文导入 DeepSeek Harness。开源、离线、可预览，支持 macOS 和 Windows。">
+  <link rel="canonical" href="https://import.1771991.xyz/">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <title>对话迁移到 DeepSeek Harness · DSH History Importer</title>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+  <header class="topbar">
+    <a class="wordmark" href="#top" aria-label="DSH History Importer 首页"><span class="mark">↗</span><span>DSH <b>History Importer</b></span></a>
+    <nav aria-label="页面导航">
+      <a href="#how">使用方法</a>
+      <a href="#scope">导入范围</a>
+      <a href="#questions">常见问题</a>
+    </nav>
+    <a class="nav-github" href="https://github.com/nfeuism/dsh-history-importer" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="main">
+    <section id="top" class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="pulse"></span> 免费开源 · 本机运行</p>
+        <h1 id="hero-title">把过去的对话，<br><em>带进新的工作台。</em></h1>
+        <p class="lead">将 Codex 和 Hermes Agent 的历史对话正文导入 DeepSeek Harness。在导入前预览数量，完成后按来源查看；原始记录留在你的电脑上。</p>
+        <div class="actions">
+          <a class="primary" href="https://github.com/nfeuism/dsh-history-importer/releases/latest" target="_blank" rel="noopener noreferrer">下载 Windows 版 <span aria-hidden="true">↗</span></a>
+          <a class="secondary" href="https://github.com/nfeuism/dsh-history-importer" target="_blank" rel="noopener noreferrer">查看源码与说明 <span aria-hidden="true">↗</span></a>
+        </div>
+        <p class="hero-note">适配 DeepSeek Harness 0.2.0-rc.2 · macOS / Windows</p>
+      </div>
+      <div class="migration" role="img" aria-label="Codex 和 Hermes 的对话正文经过本机转换，进入 DeepSeek Harness 的两个历史项目">
+        <div class="migration-head"><span>LOCAL HISTORY</span><span>ON YOUR DEVICE <i></i></span></div>
+        <div class="flow">
+          <div class="source-stack">
+            <div class="source"><span class="source-icon codex-icon">C</span><span><strong>Codex</strong><small>对话记录</small></span><span class="check">✓</span></div>
+            <div class="source"><span class="source-icon hermes-icon">H</span><span><strong>Hermes</strong><small>对话记录</small></span><span class="check">✓</span></div>
+          </div>
+          <div class="connector"><span>仅转换文字</span><svg viewBox="0 0 98 42" fill="none" aria-hidden="true"><path d="M0 21H91M79 9L91 21L79 33" stroke="currentColor" stroke-width="1.5"/></svg></div>
+          <div class="destination"><span class="dest-kicker">DEEPSEEK HARNESS</span><strong>历史对话</strong><span class="dest-row"><i></i> Codex 历史</span><span class="dest-row"><i></i> Hermes 历史</span></div>
+        </div>
+        <div class="migration-foot"><span>01 预览</span><span>02 导入</span><span>03 打开查看</span></div>
+      </div>
+    </section>
+
+    <section class="benefit-band" aria-label="项目特点"><div class="shell benefits">
+      <div><span class="benefit-icon">◈</span><strong>先预览，再写入</strong><p>默认只统计会话数量，由你决定何时导入。</p></div>
+      <div><span class="benefit-icon">◎</span><strong>记录只在本机</strong><p>读取本地历史，不上传聊天内容或数据库。</p></div>
+      <div><span class="benefit-icon">↺</span><strong>重复运行可跳过</strong><p>已有会话不会重新创建，项目登记会先备份。</p></div>
+    </div></section>
+
+    <section id="how" class="section shell" aria-labelledby="how-title">
+      <div class="section-heading"><p class="eyebrow">GET STARTED</p><h2 id="how-title">三步开始</h2><p>首次使用请先启动一次 DeepSeek Harness 完成初始化，然后完全退出应用。</p></div>
+      <div class="steps">
+        <article class="step"><span class="step-no">01</span><h3>取得程序</h3><p>Windows 用户可下载可执行文件；macOS 用户从 GitHub 获取 Python 源码。</p><a href="https://github.com/nfeuism/dsh-history-importer/releases/latest" target="_blank" rel="noopener noreferrer">前往下载 →</a></article>
+        <article class="step"><span class="step-no">02</span><h3>预览对话</h3><p>运行程序，先查看将导入多少条 Codex 和 Hermes 对话。预览不会写入文件。</p><code>python3 dsh_import.py</code></article>
+        <article class="step"><span class="step-no">03</span><h3>导入并查看</h3><p>完全退出 Harness 后执行导入；重新打开，在侧栏找到两个历史项目。</p><code>python3 dsh_import.py --import</code></article>
+      </div>
+      <div class="platform-note"><strong>Windows 命令</strong><span>用 <code>py -3</code> 替换上面的 <code>python3</code>；如果下载了 `.exe`，直接在 PowerShell 中运行 <code>.\dsh-history-importer.exe</code> 预览，运行 <code>.\dsh-history-importer.exe --import</code> 导入。</span></div>
+    </section>
+
+    <section id="scope" class="scope-wrap" aria-labelledby="scope-title"><div class="shell scope-grid">
+      <div class="scope-intro"><p class="eyebrow">WHAT MOVES</p><h2 id="scope-title">带走对话，<br>保留边界。</h2><p>这是可阅读的历史快照，适合在新工作台继续查阅和对话。</p><a href="https://github.com/nfeuism/dsh-history-importer/blob/main/README.md" target="_blank" rel="noopener noreferrer">阅读完整说明 ↗</a></div>
+      <div class="scope-list"><div><span class="scope-symbol yes">✓</span><div><h3>会导入</h3><p>用户提问、助手回答，以及可用的会话标题；在 Harness 中按 Codex / Hermes 分组。</p></div></div><div><span class="scope-symbol no">—</span><div><h3>不会导入</h3><p>图片、工具调用与输出、系统提示、项目源码、工作区文件和附件。</p></div></div><div><span class="scope-symbol lock">◇</span><div><h3>不会改动来源</h3><p>原始 Codex 文件只读；Hermes 数据库通过快照读取。导入过程不需要 API Key。</p></div></div></div>
+    </div></section>
+
+    <section id="questions" class="section shell faq" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">GOOD TO KNOW</p><h2 id="faq-title">使用前了解这些</h2></div>
+      <div class="faq-grid"><article><h3>支持哪些来源？</h3><p>首版支持本机 Codex 和 Hermes Agent 的历史对话。可只选择其中一个来源。</p></article><article><h3>Windows 构建在哪里？</h3><p>GitHub Actions 在 Windows 环境构建并检查程序，发布版位于 GitHub Releases。真实 Harness 安装仍需用户自行核对界面。</p></article><article><h3>会覆盖已有会话吗？</h3><p>不会。相同会话使用固定 ID，重复运行会跳过；修改项目登记文件前保留备份。</p></article><article><h3>其他 Harness 版本能用吗？</h3><p>当前按 0.2.0-rc.2 的会话格式制作。Harness 更新后，先查看仓库中的兼容说明。</p></article></div>
+    </section>
+
+    <section class="closing shell"><div><p class="eyebrow">OPEN SOURCE</p><h2>让已有的对话继续有用。</h2><p>查看源码、安装说明与兼容范围，选择适合自己的运行方式。</p></div><a class="primary" href="https://github.com/nfeuism/dsh-history-importer" target="_blank" rel="noopener noreferrer">访问 GitHub 仓库 <span aria-hidden="true">↗</span></a></section>
+  </main>
+
+  <footer><div class="shell footer-inner"><span>DSH History Importer · MIT License</span><span>社区项目，与 DeepSeek 官方无关联</span><a href="https://github.com/nfeuism/dsh-history-importer" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></footer>
+</body>
+</html>
