@@ -1053,6 +1053,10 @@ def report(label: str, convs: list[Conversation], stats: dict) -> None:
 
 
 def main() -> int:
+    if os.name == "nt":
+        for stream in (sys.stdout, sys.stderr):
+            if hasattr(stream, "reconfigure"):
+                stream.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description="Import Codex/Hermes text history into DeepSeek Harness")
     ap.add_argument("--source", choices=["codex", "hermes", "all"], default="all")
     ap.add_argument("--dry-run", action="store_true", help="preview only (default)")
