@@ -311,19 +311,17 @@ def _is_boilerplate(text: str) -> bool:
 
 
 def _is_machine_payload(text: str) -> bool:
-    """A whole message that is nothing but a JSON protocol object/array.
-
-    Codex can record protocol replies as ordinary assistant messages with
-    `phase: "final_answer"`. Content shape is the available signal.
-    """
+    """Known Codex approval reply; preserve other JSON assistant answers."""
     s = text.strip()
     if not s or s[0] not in "{[":
         return False
     try:
-        json.loads(s)
+        value = json.loads(s)
     except Exception:
         return False
-    return True
+    return (isinstance(value, dict) and isinstance(value.get("outcome"), str)
+            and value["outcome"] in {"allow", "deny"}
+            and set(value).issubset({"outcome", "reason", "message"}))
 
 
 def _parse_iso(ts: str) -> int:
@@ -620,11 +618,9 @@ def _hermes_connection(snapshot_dir: Path) -> sqlite3.Connection:
 
 
 def _hermes_is_noise(role: str, content: str) -> bool:
-    """Structure-based: harness injecta and compaction summaries only."""
+    """Skip known context compaction notes, keeping normal bracketed prompts."""
     c = (content or "").lstrip()
-    if role == "user" and c.startswith("["):
-        return True
-    if role == "assistant" and (
+    if role in ("user", "assistant") and (
         c.startswith("[CONTEXT COMPACTION") or c.startswith("[PRIOR CONTEXT")
     ):
         return True
