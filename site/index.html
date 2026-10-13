@@ -29,10 +29,10 @@
         <h1 id="hero-title">把过去的对话，<br><em>带进新的工作台。</em></h1>
         <p class="lead">将 Codex 和 Hermes Agent 的历史对话正文导入 DeepSeek Harness。在导入前预览数量，完成后按来源查看；原始记录留在你的电脑上。</p>
         <div class="actions">
-          <a class="primary" href="https://github.com/nfeuism/dsh-history-importer/releases/latest" target="_blank" rel="noopener noreferrer">下载 Windows 版 <span aria-hidden="true">↗</span></a>
-          <a class="secondary" href="https://github.com/nfeuism/dsh-history-importer" target="_blank" rel="noopener noreferrer">查看源码与说明 <span aria-hidden="true">↗</span></a>
+          <a class="primary" href="https://github.com/nfeuism/dsh-history-importer/releases/latest/download/dsh-history-importer-macos-arm64.zip" target="_blank" rel="noopener noreferrer">下载 Mac 版 · Apple 芯片 <span aria-hidden="true">↗</span></a>
+          <a class="secondary" href="https://github.com/nfeuism/dsh-history-importer/releases/latest/download/dsh-history-importer.exe" target="_blank" rel="noopener noreferrer">下载 Windows 版 <span aria-hidden="true">↗</span></a>
         </div>
-        <p class="hero-note">适配 DeepSeek Harness 0.2.0-rc.2 · macOS / Windows</p>
+        <p class="hero-note">Intel Mac 请下载<a href="https://github.com/nfeuism/dsh-history-importer/releases/latest/download/dsh-history-importer-macos-x86_64.zip">对应版本</a> · 适配 DeepSeek Harness 0.2.0-rc.2</p>
       </div>
       <div class="migration" role="img" aria-label="Codex 和 Hermes 的对话正文经过本机转换，进入 DeepSeek Harness 的两个历史项目">
         <div class="migration-head"><span>LOCAL HISTORY</span><span>ON YOUR DEVICE <i></i></span></div>
@@ -57,11 +57,11 @@
     <section id="how" class="section shell" aria-labelledby="how-title">
       <div class="section-heading"><p class="eyebrow">GET STARTED</p><h2 id="how-title">三步开始</h2><p>首次使用请先启动一次 DeepSeek Harness 完成初始化，然后完全退出应用。</p></div>
       <div class="steps">
-        <article class="step"><span class="step-no">01</span><h3>取得程序</h3><p>Windows 用户可下载可执行文件；macOS 用户从 GitHub 获取 Python 源码。</p><a href="https://github.com/nfeuism/dsh-history-importer/releases/latest" target="_blank" rel="noopener noreferrer">前往下载 →</a></article>
-        <article class="step"><span class="step-no">02</span><h3>预览对话</h3><p>运行程序，先查看将导入多少条 Codex 和 Hermes 对话。预览不会写入文件。</p><code>python3 dsh_import.py</code></article>
-        <article class="step"><span class="step-no">03</span><h3>导入并查看</h3><p>完全退出 Harness 后执行导入；重新打开，在侧栏找到两个历史项目。</p><code>python3 dsh_import.py --import</code></article>
+        <article class="step"><span class="step-no">01</span><h3>取得程序</h3><p>Mac 用户下载对应芯片的压缩包；Windows 用户下载可执行文件。</p><a href="https://github.com/nfeuism/dsh-history-importer/releases/latest" target="_blank" rel="noopener noreferrer">前往下载 →</a></article>
+        <article class="step"><span class="step-no">02</span><h3>预览对话</h3><p>Mac 解压后双击 Start-Import.command，选择 1 查看数量。预览不会写入文件。</p><code>Mac 菜单：1 · 预览</code></article>
+        <article class="step"><span class="step-no">03</span><h3>导入并查看</h3><p>完全退出 Harness 后选择 2 导入；重新打开，在侧栏找到两个历史项目。</p><code>Mac 菜单：2 · 导入</code></article>
       </div>
-      <div class="platform-note"><strong>Windows 命令</strong><span>用 <code>py -3</code> 替换上面的 <code>python3</code>；如果下载了 `.exe`，直接在 PowerShell 中运行 <code>.\dsh-history-importer.exe</code> 预览，运行 <code>.\dsh-history-importer.exe --import</code> 导入。</span></div>
+      <div class="platform-note"><strong>Windows 命令</strong><span>在 PowerShell 中运行 <code>.\dsh-history-importer.exe</code> 预览，运行 <code>.\dsh-history-importer.exe --import</code> 导入。源码运行方式见 <a href="https://github.com/nfeuism/dsh-history-importer/blob/main/README.md">README</a>。</span></div>
     </section>
 
     <section id="scope" class="scope-wrap" aria-labelledby="scope-title"><div class="shell scope-grid">
@@ -70,7 +70,7 @@
     </div></section>
 
     <section id="questions" class="section shell faq" aria-labelledby="faq-title"><div class="section-heading"><p class="eyebrow">GOOD TO KNOW</p><h2 id="faq-title">使用前了解这些</h2></div>
-      <div class="faq-grid"><article><h3>支持哪些来源？</h3><p>首版支持本机 Codex 和 Hermes Agent 的历史对话。可只选择其中一个来源。</p></article><article><h3>Windows 构建在哪里？</h3><p>GitHub Actions 在 Windows 环境构建并检查程序，发布版位于 GitHub Releases。真实 Harness 安装仍需用户自行核对界面。</p></article><article><h3>会覆盖已有会话吗？</h3><p>不会。相同会话使用固定 ID，重复运行会跳过；修改项目登记文件前保留备份。</p></article><article><h3>其他 Harness 版本能用吗？</h3><p>当前按 0.2.0-rc.2 的会话格式制作。Harness 更新后，先查看仓库中的兼容说明。</p></article></div>
+      <div class="faq-grid"><article><h3>支持哪些来源？</h3><p>首版支持本机 Codex 和 Hermes Agent 的历史对话。可只选择其中一个来源。</p></article><article><h3>Mac 安装包如何打开？</h3><p>下载对应芯片的压缩包，解压后双击 Start-Import.command。程序未经 Apple 开发者证书公证；首次打开可能需要在系统提示中确认。</p></article><article><h3>会覆盖已有会话吗？</h3><p>不会。相同会话使用固定 ID，重复运行会跳过；修改项目登记文件前保留备份。</p></article><article><h3>其他 Harness 版本能用吗？</h3><p>当前按 0.2.0-rc.2 的会话格式制作。Harness 更新后，先查看仓库中的兼容说明。</p></article></div>
     </section>
 
     <section class="closing shell"><div><p class="eyebrow">OPEN SOURCE</p><h2>让已有的对话继续有用。</h2><p>查看源码、安装说明与兼容范围，选择适合自己的运行方式。</p></div><a class="primary" href="https://github.com/nfeuism/dsh-history-importer" target="_blank" rel="noopener noreferrer">访问 GitHub 仓库 <span aria-hidden="true">↗</span></a></section>
