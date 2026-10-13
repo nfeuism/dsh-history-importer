@@ -7,7 +7,7 @@
 ## 准备
 
 1. 先安装并启动一次 DeepSeek Harness，完成初始设置，然后**完全退出应用**。
-2. 安装 Python 3.10 或更新版本，以及 `zstd`：
+2. 准备 Python 3.9 或更新版本，以及 `zstd`：
 
    ```bash
    brew install zstd
