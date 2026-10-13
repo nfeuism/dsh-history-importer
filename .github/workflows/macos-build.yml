@@ -1,0 +1,46 @@
+name: macOS build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    strategy:
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build requirements
+        run: python -m pip install -r requirements.txt pyinstaller
+      - name: Build standalone program
+        run: python -m PyInstaller --onefile --clean --name dsh-history-importer dsh_import.py
+      - name: Package double-click launcher
+        run: |
+          cp scripts/Start-Import.command dist/Start-Import.command
+          chmod +x dist/Start-Import.command dist/dsh-history-importer
+          cd dist
+          zip -q "dsh-history-importer-macos-${{ matrix.arch }}.zip" Start-Import.command dsh-history-importer
+      - name: Upload macOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-history-importer-macos-${{ matrix.arch }}
+          path: dist/dsh-history-importer-macos-${{ matrix.arch }}.zip
+      - name: Add package to tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.ref_name }}" "dist/dsh-history-importer-macos-${{ matrix.arch }}.zip" --clobber
