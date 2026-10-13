@@ -22,6 +22,11 @@ import tempfile
 import uuid
 from pathlib import Path
 
+try:
+    import zstandard as _zstandard
+except ImportError:
+    _zstandard = None
+
 # --------------------------------------------------------------------------
 # Locations
 # --------------------------------------------------------------------------
@@ -604,7 +609,7 @@ def _hermes_connection(snapshot_dir: Path) -> sqlite3.Connection:
     """Snapshot Hermes' live SQLite database through the online-backup API."""
     if not HERMES_DB.exists():
         raise SystemExit(f"Hermes database not found: {HERMES_DB}")
-    src = sqlite3.connect(f"file:{HERMES_DB}?mode=ro", uri=True, timeout=15)
+    src = sqlite3.connect(f"{HERMES_DB.as_uri()}?mode=ro", uri=True, timeout=15)
     snapshot = snapshot_dir / "hermes.db"
     dst = sqlite3.connect(snapshot)
     try:
@@ -726,7 +731,42 @@ def find_zstd() -> str:
         path = shutil.which(cand) if "/" not in cand else (cand if os.path.exists(cand) else None)
         if path:
             return path
-    raise SystemExit("zstd not found; install it (brew install zstd) or add it to PATH")
+    raise SystemExit("Zstandard support not found; install requirements.txt or the zstd command")
+
+
+def compress_frame(data: bytes) -> bytes:
+    if _zstandard is not None:
+        return _zstandard.ZstdCompressor(write_checksum=True).compress(data)
+    proc = subprocess.run([find_zstd(), "--check", "-q", "-c"], input=data,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if proc.returncode:
+        raise OSError(proc.stderr.decode("utf-8", "replace"))
+    return proc.stdout
+
+
+def decompress_two_frames(path: Path) -> bytes:
+    if _zstandard is not None:
+        raw = path.read_bytes()
+        first = _zstandard.ZstdDecompressor().decompressobj()
+        header = first.decompress(raw)
+        rest = first.unused_data
+        if not first.eof or not rest:
+            raise ValueError(f"DSH requires separate header and event frames: {path}")
+        second = _zstandard.ZstdDecompressor().decompressobj()
+        body = second.decompress(rest)
+        if not second.eof or second.unused_data:
+            raise ValueError(f"DSH requires exactly two Zstandard frames: {path}")
+        if header.count(b"\n") != 1 or not header.endswith(b"\n"):
+            raise ValueError(f"First frame must hold only the session header: {path}")
+        return header + body
+    zstd = find_zstd()
+    frame_info = subprocess.run([zstd, "-lv", str(path)], capture_output=True,
+                                text=True, check=True)
+    if not re.search(r"# Zstandard Frames:\s*2(?:\D|$)", frame_info.stdout + frame_info.stderr):
+        raise ValueError(f"DSH requires exactly two Zstandard frames: {path}")
+    result = subprocess.run([zstd, "-d", "-q", "-c", str(path)],
+                            capture_output=True, check=True)
+    return result.stdout
 
 
 def write_conversation(conv: Conversation, cwd: Path) -> tuple[Path, bool]:
@@ -752,28 +792,16 @@ def write_conversation(conv: Conversation, cwd: Path) -> tuple[Path, bool]:
     payload = builder.to_jsonl().encode("utf-8")
 
     target.parent.mkdir(parents=True, exist_ok=True)
-    zstd = find_zstd()
     # DSH requires the header line to occupy its own Zstandard frame.
     # Its session lister reads only that first frame during startup.
     header, body = payload.split(b"\n", 1)
     if not body:
         raise SystemExit(f"session {sid} has no event rows")
 
-    def frame(data: bytes) -> bytes:
-        proc = subprocess.run(
-            [zstd, "--check", "-q", "-c"],
-            input=data,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        if proc.returncode != 0:
-            raise SystemExit(f"zstd failed: {proc.stderr.decode('utf-8', 'replace')}")
-        return proc.stdout
-
     with tempfile.NamedTemporaryFile(dir=target.parent, prefix=".session-", suffix=".tmp",
                                      delete=False) as fh:
         tmp = Path(fh.name)
-        fh.write(frame(header + b"\n") + frame(body))
+        fh.write(compress_frame(header + b"\n") + compress_frame(body))
         fh.flush()
         os.fsync(fh.fileno())
     try:
@@ -795,14 +823,7 @@ def write_conversation(conv: Conversation, cwd: Path) -> tuple[Path, bool]:
 
 
 def verify_log(path: Path, expected_id: str) -> None:
-    zstd = find_zstd()
-    frame_info = subprocess.run([zstd, "-lv", str(path)], capture_output=True, text=True,
-                                check=True)
-    if not re.search(r"# Zstandard Frames:\s*2(?:\D|$)", frame_info.stdout + frame_info.stderr):
-        raise ValueError(f"DSH requires exactly two Zstandard frames: {path}")
-    result = subprocess.run([zstd, "-d", "-q", "-c", str(path)],
-                            capture_output=True, check=True)
-    rows = [json.loads(line) for line in result.stdout.splitlines() if line]
+    rows = [json.loads(line) for line in decompress_two_frames(path).splitlines() if line]
     if not rows or rows[0].get("type") != "session" or rows[0].get("version") != 4:
         raise ValueError(f"invalid session header: {path}")
     if rows[0].get("id") != expected_id:
@@ -868,6 +889,14 @@ def write_cache(builder: SessionBuilder) -> bool:
 
 
 def dsh_is_running() -> bool:
+    if os.name == "nt":
+        proc = subprocess.run(["tasklist", "/FO", "CSV", "/NH"], capture_output=True,
+                              text=True)
+        if proc.returncode:
+            raise SystemExit("Cannot determine whether DeepSeek Harness is running")
+        import csv
+        return any("deepseek harness" in row[0].lower()
+                   for row in csv.reader(proc.stdout.splitlines()) if row)
     proc = subprocess.run(["pgrep", "-f", "DeepSeek Harness"], capture_output=True, text=True)
     if proc.returncode not in (0, 1):
         raise SystemExit("Cannot determine whether DeepSeek Harness is running; close it and retry")
