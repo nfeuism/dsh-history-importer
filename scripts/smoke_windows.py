@@ -5,6 +5,7 @@ import sqlite3
 import subprocess
 import sys
 import tempfile
+from contextlib import closing
 from pathlib import Path
 
 
@@ -30,7 +31,7 @@ def run() -> None:
         rollout.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
         hermes = root / "hermes" / "state.db"
         hermes.parent.mkdir()
-        with sqlite3.connect(hermes) as db:
+        with closing(sqlite3.connect(hermes)) as db:
             db.execute("CREATE TABLE sessions (id TEXT, title TEXT, started_at REAL, model TEXT, source TEXT)")
             db.execute("CREATE TABLE messages (id INTEGER, session_id TEXT, role TEXT, content TEXT, timestamp REAL, active INTEGER)")
             db.execute("INSERT INTO sessions VALUES (?, ?, ?, ?, ?)",
