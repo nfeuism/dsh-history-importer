@@ -2,9 +2,21 @@
 
 将本机 **Codex** 和 **Hermes Agent** 的历史对话正文导入 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)，并按来源显示在两个项目中。
 
-目前面向 **macOS / Windows、DeepSeek Harness 0.2.0-rc.2**。Windows 版本由 GitHub Actions 在 Windows 环境构建并检查；尚未在真实 Windows Harness 安装上实测。这是社区工具，不是 DeepSeek 官方功能。
+目前面向 **macOS / Windows、DeepSeek Harness 0.2.0-rc.2**。macOS 和 Windows 安装包由 GitHub Actions 分别构建；Windows 版尚未在真实 Harness 安装上实测。这是社区工具，不是 DeepSeek 官方功能。
 
-## 准备
+## macOS：下载后双击使用
+
+1. 先启动一次 DeepSeek Harness 完成初始化，再从应用菜单**完全退出**。
+2. 在 [Releases 下载页](https://github.com/nfeuism/dsh-history-importer/releases/latest)选择对应压缩包：Apple 芯片下载 `macos-arm64.zip`，Intel 芯片下载 `macos-x86_64.zip`。
+3. 解压后双击 `Start-Import.command`。输入 `1` 预览对话数量；输入 `2` 开始导入。完成后重新打开 Harness，在侧栏查看 **Codex 历史**、**Hermes 历史**。
+
+压缩包自带程序，无需安装 Python、Homebrew 或 `zstd`。这是未使用 Apple 开发者证书公证的社区程序，macOS 首次打开时可能要求你在系统提示中确认；只从本仓库下载，并核对发布页上的文件名。若系统不允许启动，可使用下方源码运行方式。不要关闭 macOS 的安全保护。
+
+## Windows：下载可执行文件
+
+从 [Releases 下载页](https://github.com/nfeuism/dsh-history-importer/releases/latest)下载 `dsh-history-importer.exe`，在 PowerShell 中打开文件所在目录，运行 `./dsh-history-importer.exe` 预览，运行 `./dsh-history-importer.exe --import` 导入。无需安装 Python。Windows 构建状态见 [GitHub Actions](https://github.com/nfeuism/dsh-history-importer/actions/workflows/windows-build.yml)。
+
+## 从源码运行
 
 1. 先安装并启动一次 DeepSeek Harness，完成初始设置，然后**完全退出应用**。
 2. 准备 Python 3.9 或更新版本。macOS 可安装 `zstd`：
@@ -26,7 +38,7 @@ Windows 和 macOS 都可安装 Python 压缩依赖，替代 `zstd` 命令：
 python3 -m pip install -r requirements.txt
 ```
 
-Windows PowerShell 中，将文中的 `python3` 换成 `py -3`；安装依赖用 `py -3 -m pip install -r requirements.txt`。也可从 [Releases](https://github.com/nfeuism/dsh-history-importer/releases) 下载 Windows `.exe`，无需另装 Python。Windows 构建状态见 [GitHub Actions](https://github.com/nfeuism/dsh-history-importer/actions/workflows/windows-build.yml)。
+Windows PowerShell 中，将下文的 `python3` 换成 `py -3`；安装依赖用 `py -3 -m pip install -r requirements.txt`。
 
 不需要提供账号密码或 API Key；程序只读取本机的历史文件。
 
