@@ -1,0 +1,35 @@
+name: Windows build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install build requirements
+        run: python -m pip install -r requirements.txt pyinstaller
+      - name: Build Windows executable
+        run: python -m PyInstaller --onefile --clean --name dsh-history-importer dsh_import.py
+      - name: Check Windows import and re-run behavior
+        run: python scripts/smoke_windows.py dist/dsh-history-importer.exe
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: dsh-history-importer-windows
+          path: dist/dsh-history-importer.exe
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" dist/dsh-history-importer.exe --title "${{ github.ref_name }}" --generate-notes
